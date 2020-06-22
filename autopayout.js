@@ -136,7 +136,7 @@ const main = async () => {
 
           // Claim rewards
           const nonce = (await api.derive.balances.account(address)).accountNonce
-          const hash = await api.tx.api.tx.utility.batch(transactions).signAndSend(signer, { nonce });
+          const hash = await api.tx.utility.batch(transactions).signAndSend(signer, { nonce });
 
           console.log(`\n\x1b[32m\x1b[1mSuccess! \x1b[37mCheck tx in PolkaScan: https://polkascan.io/pre/kusama/transaction/${hash.toString()}\x1b[0m\n`);
 
