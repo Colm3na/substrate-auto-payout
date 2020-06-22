@@ -124,7 +124,7 @@ const main = async () => {
         const lastClaimedReward = claimedRewards[claimedRewards.length - 1];
         console.log(`\x1b[1m -> Last claimed era is ${lastClaimedReward}\x1b[0m`);
         if (lastClaimedReward < currentEra) {
-          console.log(`\x1b[1m -> ${currentEra - lastClaimedReward - 2} unclaimed era rewards\x1b[0m`);
+          console.log(`\x1b[1m -> ${currentEra - lastClaimedReward - 1} unclaimed era rewards\x1b[0m`);
           let transactions = [];
           let era = parseInt(lastClaimedReward) + 1;
           for (era; era < currentEra; era++) {
