@@ -8,6 +8,7 @@
  * Author: Mario Pino | @mariopino:matrix.org
  */
 
+const BigNumber = require('bignumber.js');
 const { ApiPromise, WsProvider } = require('@polkadot/api');
 const keyring = require('@polkadot/ui-keyring').default;
 keyring.initKeyring({
@@ -94,6 +95,17 @@ const main = async () => {
     console.log(`\x1b[1m -> Connecting to\x1b[0m`, wsProvider);
     const provider = new WsProvider(wsProvider);
     const api = await ApiPromise.create({ provider });
+
+    // Check account balance
+    const accountBalance = await api.query.system.account(address)
+    const totalBalance = accountBalance.data.free
+    const freeBalance = BigNumber(totalBalance.toString()).minus(
+      account.data.miscFrozen.toString()
+    )
+    if (freeBalance === 0) {
+      console.log(`\x1b[1m -> Account doesn't have free funds\x1b[0m`);
+    }
+    console.log(`\x1b[1m -> Account free balance is ${(freeBalance * 1e-12).toFixed(3)} KSM\x1b[0m`);
 
     // Subscribe to new blocks
     console.log(`\x1b[1m -> Subscribing to new blocks\x1b[0m`);
