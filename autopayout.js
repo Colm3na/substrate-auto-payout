@@ -107,6 +107,7 @@ const main = async () => {
       const { currentEra } = await api.derive.session.progress();
 
       if (currentEra > savedEra) {
+        console.log(`\x1b[1m -> Current era is ${currentEra}\x1b[0m`);
         savedEra = currentEra;
       }
     });
