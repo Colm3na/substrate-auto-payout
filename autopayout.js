@@ -109,7 +109,7 @@ const main = async () => {
 
     // Subscribe to new blocks
     console.log(`\x1b[1m -> Subscribing to new blocks\x1b[0m`);
-    await api.rpc.chain.subscribeNewHeads(async (header) => {
+    await api.rpc.chain.subscribeNewHeads(async () => {
   
       // Get session progress info
       const currentEra = await api.query.staking.currentEra();
@@ -128,31 +128,23 @@ const main = async () => {
           let transactions = [];
           let era = parseInt(lastClaimedReward) + 1;
           for (era; era < currentEra; era++) {
-            // Check if validator was active at this era
+            // Check if validator was active at era
             const eraPoints = await api.query.staking.erasRewardPoints(era);
             const eraValidators = Object.keys(eraPoints.individual).map(validator => {
               return validator;
             });
-
-            console.log(JSON.stringify(eraValidators, null, 2));
-
-
-            transactions.push(api.tx.staking.payoutStakers(validator, era));
+            if (eraValidators.includes(validator)) {
+              transactions.push(api.tx.staking.payoutStakers(validator, era));
+            }
           }
 
-          // console.log(`transactions:`, transactions);
-
-          // Claim rewards
-
+          // Claim rewards tx
           const nonce = (await api.derive.balances.account(address)).accountNonce
           const hash = await api.tx.utility.batch(transactions).signAndSend(signer, { nonce });
-
           console.log(`\n\x1b[32m\x1b[1mSuccess! \x1b[37mCheck tx in PolkaScan: https://polkascan.io/pre/kusama/transaction/${hash.toString()}\x1b[0m\n`);
-
           if (log) {
             fs.appendFileSync(`autopayout.log`, `${new Date()} - Current era ${currentEra}, claimed rewards for last ${currentEra - lastClaimedReward - 1} eras, tx hash is ${hash.toString()}`);
           }
-
         }
       }
     });
