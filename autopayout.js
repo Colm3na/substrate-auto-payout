@@ -45,7 +45,7 @@ const argv = yargs
   .help()
   .alias('help', 'h')
   .version()
-  .alias('version', 'v')
+  .alias('version', 'V')
   .argv;
 
 // Exported account json file
@@ -119,6 +119,9 @@ const main = async () => {
         savedEra = currentEra;
 
         // check validator unclaimed rewards
+
+        console.log(`validator:`, validator);
+
         const stakingInfo = await api.derive.staking.account(validator);
         const claimedRewards = stakingInfo.stakingLedger.claimedRewards;
 
