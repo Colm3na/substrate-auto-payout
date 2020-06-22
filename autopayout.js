@@ -112,23 +112,38 @@ const main = async () => {
     await api.rpc.chain.subscribeNewHeads(async (header) => {
   
       // Get session progress info
-      const { currentEra } = await api.derive.session.progress();
+      const currentEra = await api.query.staking.currentEra();
 
       if (currentEra > savedEra) {
         console.log(`\x1b[1m -> Current era is ${currentEra}, waiting era change ...\x1b[0m`);
         savedEra = currentEra;
 
-        // check validator unclaimed rewards
+        // Check validator unclaimed rewards
         const stakingInfo = await api.derive.staking.account(validator);
         const claimedRewards = stakingInfo.stakingLedger.claimedRewards;
-
-        console.log(`claimedRewards:`, JSON.stringify(claimedRewards, null, 2));
-
         const lastClaimedReward = claimedRewards[claimedRewards.length - 1];
         console.log(`\x1b[1m -> Last claimed era is ${lastClaimedReward}\x1b[0m`);
-
         if (lastClaimedReward < currentEra) {
-          console.log(`\x1b[1m -> ${currentEra - lastClaimedReward} unclaimed era rewards\x1b[0m`);
+          console.log(`\x1b[1m -> ${currentEra - 1 - lastClaimedReward} unclaimed era rewards\x1b[0m`);
+          let transactions = [];
+          for (let era = lastClaimedReward + 1; era > currentEra; era++) {
+            transactions.push(api.tx.staking.payoutStakers(validator, era));
+          }
+
+          // TODO: need to figure out if validator was active in last unclaimed eras
+          // so we only claim reward for those eras (the tx may fail if validator was not active
+          // on one of the unclaimed eras)
+
+          // Claim rewards
+          const nonce = (await api.derive.balances.account(address)).accountNonce
+          const hash = await api.tx.api.tx.utility.batch(transactions).signAndSend(signer, { nonce });
+
+          console.log(`\n\x1b[32m\x1b[1mSuccess! \x1b[37mCheck tx in PolkaScan: https://polkascan.io/pre/kusama/transaction/${hash.toString()}\x1b[0m\n`);
+
+          if (log) {
+            fs.appendFileSync(`autopayout.log`, `${new Date()} - Current era ${currentEra}, claimed rewards for last ${currentEra - 1 - lastClaimedReward} eras, tx hash is ${hash.toString()}`);
+          }
+
         }
       }
     });
