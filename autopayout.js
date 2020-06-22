@@ -126,7 +126,7 @@ const main = async () => {
         if (lastClaimedReward < currentEra) {
           console.log(`\x1b[1m -> ${currentEra - lastClaimedReward - 2} unclaimed era rewards\x1b[0m`);
           let transactions = [];
-          for (let era = lastClaimedReward + 1; era > currentEra; era++) {
+          for (let era = lastClaimedReward + 1; era < currentEra; era++) {
             transactions.push(api.tx.staking.payoutStakers(validator, era));
           }
 
