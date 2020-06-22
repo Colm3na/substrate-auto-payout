@@ -130,7 +130,7 @@ const main = async () => {
           for (era; era < currentEra; era++) {
             // Check if validator was active at era
             const eraPoints = await api.query.staking.erasRewardPoints(era);
-            const eraValidators = Object.keys(eraPoints.individual).map(validator => {
+            const eraValidators = Object.keys(JSON.parse(JSON.stringify(eraPoints.individual))).map(validator => {
               return validator;
             });
             if (eraValidators.includes(validator)) {
