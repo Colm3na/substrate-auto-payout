@@ -130,19 +130,22 @@ const main = async () => {
             transactions.push(api.tx.staking.payoutStakers(validator, era));
           }
 
+          console.log(`transactions:`, transactions);
+
           // TODO: need to figure out if validator was active in last unclaimed eras
           // so we only claim reward for those eras (the tx may fail if validator was not active
           // on one of the unclaimed eras)
 
           // Claim rewards
-          const nonce = (await api.derive.balances.account(address)).accountNonce
-          const hash = await api.tx.utility.batch(transactions).signAndSend(signer, { nonce });
 
-          console.log(`\n\x1b[32m\x1b[1mSuccess! \x1b[37mCheck tx in PolkaScan: https://polkascan.io/pre/kusama/transaction/${hash.toString()}\x1b[0m\n`);
+          // const nonce = (await api.derive.balances.account(address)).accountNonce
+          // const hash = await api.tx.utility.batch(transactions).signAndSend(signer, { nonce });
 
-          if (log) {
-            fs.appendFileSync(`autopayout.log`, `${new Date()} - Current era ${currentEra}, claimed rewards for last ${currentEra - lastClaimedReward - 2} eras, tx hash is ${hash.toString()}`);
-          }
+          // console.log(`\n\x1b[32m\x1b[1mSuccess! \x1b[37mCheck tx in PolkaScan: https://polkascan.io/pre/kusama/transaction/${hash.toString()}\x1b[0m\n`);
+
+          // if (log) {
+          //   fs.appendFileSync(`autopayout.log`, `${new Date()} - Current era ${currentEra}, claimed rewards for last ${currentEra - lastClaimedReward - 2} eras, tx hash is ${hash.toString()}`);
+          // }
 
         }
       }
