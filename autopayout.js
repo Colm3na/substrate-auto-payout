@@ -124,7 +124,7 @@ const main = async () => {
         const lastClaimedReward = claimedRewards[claimedRewards.length - 1];
         console.log(`\x1b[1m -> Last claimed era is ${lastClaimedReward}\x1b[0m`);
         if (lastClaimedReward < currentEra) {
-          console.log(`\x1b[1m -> ${currentEra - 1 - lastClaimedReward} unclaimed era rewards\x1b[0m`);
+          console.log(`\x1b[1m -> ${currentEra - lastClaimedReward - 2} unclaimed era rewards\x1b[0m`);
           let transactions = [];
           for (let era = lastClaimedReward + 1; era > currentEra; era++) {
             transactions.push(api.tx.staking.payoutStakers(validator, era));
@@ -141,7 +141,7 @@ const main = async () => {
           console.log(`\n\x1b[32m\x1b[1mSuccess! \x1b[37mCheck tx in PolkaScan: https://polkascan.io/pre/kusama/transaction/${hash.toString()}\x1b[0m\n`);
 
           if (log) {
-            fs.appendFileSync(`autopayout.log`, `${new Date()} - Current era ${currentEra}, claimed rewards for last ${currentEra - 1 - lastClaimedReward} eras, tx hash is ${hash.toString()}`);
+            fs.appendFileSync(`autopayout.log`, `${new Date()} - Current era ${currentEra}, claimed rewards for last ${currentEra - lastClaimedReward - 2} eras, tx hash is ${hash.toString()}`);
           }
 
         }
