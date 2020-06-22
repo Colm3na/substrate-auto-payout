@@ -48,7 +48,7 @@ const argv = yargs
   .argv;
 
 // Exported account json file
-const account = argv.account;
+const accountJSON = argv.account;
 
 // Password param
 let password = argv.password || false;
@@ -70,7 +70,7 @@ const main = async () => {
   console.log("\x1b[1m - Check source at https://github.com/Colm3na/substrate-auto-payout\x1b[0m");
   console.log("\x1b[32m\x1b[1m - Made with love from ColmenaLabs_SVQ https://colmenalabs.org/\x1b[0m\n");
 
-  let raw = fs.readFileSync(controller, { encoding: 'utf-8' });
+  let raw = fs.readFileSync(accountJSON, { encoding: 'utf-8' });
   const account = JSON.parse(raw);
   const address = account.address;
   
