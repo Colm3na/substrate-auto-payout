@@ -128,7 +128,7 @@ const main = async () => {
         console.log(`\x1b[1m -> Last claimed era is ${lastClaimedReward}\x1b[0m`);
 
         if (lastClaimedReward < currentEra) {
-          console.log(`\x1b[1m -> ${lastClaimedReward < currentEra} unclaimed era rewards\x1b[0m`);
+          console.log(`\x1b[1m -> ${lastClaimedReward - currentEra} unclaimed era rewards\x1b[0m`);
         }
       }
     });
