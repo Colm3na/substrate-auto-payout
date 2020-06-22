@@ -100,7 +100,7 @@ const main = async () => {
     const accountBalance = await api.query.system.account(address)
     const totalBalance = accountBalance.data.free
     const freeBalance = BigNumber(totalBalance.toString()).minus(
-      account.data.miscFrozen.toString()
+      accountBalance.data.miscFrozen.toString()
     )
     if (freeBalance === 0) {
       console.log(`\x1b[1m -> Account doesn't have free funds\x1b[0m`);
