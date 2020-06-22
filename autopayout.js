@@ -119,20 +119,17 @@ const main = async () => {
         savedEra = currentEra;
 
         // check validator unclaimed rewards
-
-        console.log(`validator:`, validator);
-
         const stakingInfo = await api.derive.staking.account(validator);
         const claimedRewards = stakingInfo.stakingLedger.claimedRewards;
 
         console.log(`claimedRewards:`, JSON.stringify(claimedRewards, null, 2));
 
-        // const lastClaimedReward = claimedRewards[claimedRewards.length - 1];
-        // console.log(`\x1b[1m -> Last claimed era is ${lastClaimedReward}\x1b[0m`);
+        const lastClaimedReward = claimedRewards[claimedRewards.length - 1];
+        console.log(`\x1b[1m -> Last claimed era is ${lastClaimedReward}\x1b[0m`);
 
-        // if (lastClaimedReward < currentEra) {
-        //   console.log(`\x1b[1m -> ${lastClaimedReward < currentEra} unclaimed era rewards\x1b[0m`);
-        // }
+        if (lastClaimedReward < currentEra) {
+          console.log(`\x1b[1m -> ${lastClaimedReward < currentEra} unclaimed era rewards\x1b[0m`);
+        }
       }
     });
   }
