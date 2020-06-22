@@ -110,17 +110,23 @@ const main = async () => {
     // Subscribe to new blocks
     console.log(`\x1b[1m -> Subscribing to new blocks\x1b[0m`);
     await api.rpc.chain.subscribeNewHeads(async (header) => {
-
-      // Get block number
-      const blockNumber = header.number.toNumber();
-      console.log(`\x1b[1m -> Current block is ${blockNumber}\x1b[0m`);
   
       // Get session progress info
       const { currentEra } = await api.derive.session.progress();
 
       if (currentEra > savedEra) {
-        console.log(`\x1b[1m -> Current era is ${currentEra}\x1b[0m`);
+        console.log(`\x1b[1m -> Current era is ${currentEra}, waiting era change ...\x1b[0m`);
         savedEra = currentEra;
+
+        // check validator unclaimed rewards
+        const stakingInfo = await api.derive.staking.account(validator);
+        const claimedRewards = stakingInfo.stakingLedger.claimedRewards;
+        const lastClaimedReward = claimedRewards[claimedRewards.length - 1];
+        console.log(`\x1b[1m -> Last claimed era is ${lastClaimedReward}\x1b[0m`);
+
+        if (lastClaimedReward < currentEra) {
+          console.log(`\x1b[1m -> ${lastClaimedReward < currentEra} unclaimed era rewards\x1b[0m`);
+        }
       }
     });
   }
