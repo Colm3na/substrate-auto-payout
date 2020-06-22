@@ -128,15 +128,19 @@ const main = async () => {
           let transactions = [];
           let era = parseInt(lastClaimedReward) + 1;
           for (era; era < currentEra; era++) {
-            console.log(`pending era:`, era);
+            // Check if validator was active at this era
+            const eraPoints = await api.query.staking.erasRewardPoints(era);
+            const eraValidators = Object.keys(eraPoints).map(validator => {
+              return validator;
+            });
+
+            console.log(JSON.stringify(eraValidators, null, 2));
+
+
             transactions.push(api.tx.staking.payoutStakers(validator, era));
           }
 
           // console.log(`transactions:`, transactions);
-
-          // TODO: need to figure out if validator was active in last unclaimed eras
-          // so we only claim reward for those eras (the tx may fail if validator was not active
-          // on one of the unclaimed eras)
 
           // Claim rewards
 
