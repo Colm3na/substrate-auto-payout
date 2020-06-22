@@ -110,10 +110,7 @@ const main = async () => {
         savedEra = currentEra;
       }
     });
-  
   }
-
-  process.exit();
 }
 
 try {
