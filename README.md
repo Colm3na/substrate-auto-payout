@@ -1,6 +1,6 @@
 # Substrate validator auto payout
 
-Claim rewards for your validator automatically for Substrate based blockchains.
+Claim staking rewards for your stakers automagically in Substrate based blockchains.
 
 Made with ❤️ from ColmenaLabs_SVQ!
 
