@@ -104,5 +104,6 @@ dist
 .tern-port
 
 # Noope
+keystores/*.json
 sessionkeys.log
 lastkeys.log
