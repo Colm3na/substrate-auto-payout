@@ -23,11 +23,11 @@ Go to [Polkadot JS UI](https://polkadot.js.org/apps/#/accounts) and export the a
 Subscription mode:
 
 ```
-$ node autopayout.js -a keystores/account.json -p password -v validator_stash_address
+node autopayout.js -a keystores/account.json -p password -v validator_stash_address
 ```
 
 Cron mode:
 
 ```
-$ node autopayout-cron.js -a keystores/account.json -p password -v validator_stash_address
+node autopayout-cron.js -a keystores/account.json -p password -v validator_stash_address
 ```
