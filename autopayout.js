@@ -141,7 +141,7 @@ const main = async () => {
           // Claim rewards tx
           const nonce = (await api.derive.balances.account(address)).accountNonce
           const hash = await api.tx.utility.batch(transactions).signAndSend(signer, { nonce });
-          console.log(`\n\x1b[32m\x1b[1mSuccess! \x1b[37mCheck tx in PolkaScan: https://polkascan.io/pre/kusama/transaction/${hash.toString()}\x1b[0m\n`);
+          console.log(`\n\x1b[32m\x1b[1mSuccess! \x1b[37mCheck tx in PolkaScan: https://polkascan.io/kusama/transaction/${hash.toString()}\x1b[0m\n`);
           if (log) {
             fs.appendFileSync(`autopayout.log`, `${new Date()} - Current era ${currentEra}, claimed rewards for last ${currentEra - lastClaimedReward - 1} eras, tx hash is ${hash.toString()}`);
           }
