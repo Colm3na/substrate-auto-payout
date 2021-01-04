@@ -20,12 +20,24 @@ Go to [Polkadot JS UI](https://polkadot.js.org/apps/#/accounts) and export the a
 
 ## Usage
 
+Using parameters:
+
 ```
 node autopayout.js -a keystores/account.json -p password -v validator_stash_address
 ```
 
-Or simply edit `config.js` with your data and run without any parameter:
+Ask for password:
+
+```
+node autopayout.js -a keystores/account.json -v validator_stash_address
+```
+
+Or simply edit `config.js` with your data and run without any parameter (cron friendly):
 
 ```
 node autopayout.js
 ```
+
+NOTE: Set `config.js` file permissions to `600` for better security.
+
+TODO: It doesn't take in account ongoing elections yet!

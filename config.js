@@ -5,5 +5,5 @@ module.exports = {
   validator: 'GTzRQPzkcuynHgkEHhsPBFpKdh4sAacVRsnd8vYfPpTMeEY',
   password: '',
   accountJSON: './keystores/account.json',
-  logFile: './autopayout.log',
+  log: true,
 }

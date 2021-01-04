@@ -58,7 +58,7 @@ let password = argv.password || config.password;
 const validator = argv.validator || config.validator;
 
 // Logging to file param
-const log = argv.log || config.logFile;
+const log = argv.log || config.log;
 
 // Node websocket
 const wsProvider = config.nodeWS;
@@ -73,12 +73,19 @@ const main = async () => {
   try {
     raw = fs.readFileSync(accountJSON, { encoding: 'utf-8' });
   } catch(err) {
-    console.log(`\x1b[31m\x1b[1mERROR: Can't open ${accountJSON}\x1b[0m\n`);
+    console.log(`\x1b[31m\x1b[1mError! Can't open ${accountJSON}\x1b[0m\n`);
     process.exit(1);
   }
 
   const account = JSON.parse(raw);
   const address = account.address;
+
+  if (!validator) {
+    console.log(`\x1b[31m\x1b[1mError! Empty validator stash address\x1b[0m\n`);
+    process.exit(1);
+  } else {
+    console.log(`\x1b[1m -> Validator stash address is\x1b[0m`, validator);
+  }
   
   // Prompt user to enter password
   if (!password) {
@@ -91,8 +98,7 @@ const main = async () => {
   }
 
   if (password) {
-
-    console.log(`\n\x1b[1m -> Importing account\x1b[0m`, address)
+    console.log(`\x1b[1m -> Importing account\x1b[0m`, address);
     const signer = keyring.restoreAccount(account, password); 
     signer.decodePkcs8(password);
 
@@ -108,7 +114,7 @@ const main = async () => {
       accountBalance.data.miscFrozen.toString()
     )
     if (freeBalance === 0) {
-      console.log(`\x1b[31m\x1b[1mERROR: Account ${address} doesn't have free funds\x1b[0m\n`);
+      console.log(`\x1b[31m\x1b[1mError! Account ${address} doesn't have free funds\x1b[0m\n`);
       process.exit(1);
     }
     console.log(`\x1b[1m -> Account ${address} free balance is ${(new BigNumber(freeBalance).div(new BigNumber(10).pow(config.decimalPlaces))).toFixed(3)} ${config.denom}\x1b[0m`);
@@ -120,8 +126,10 @@ const main = async () => {
     // Check validator unclaimed rewards
     const stakingInfo = await api.derive.staking.account(validator);
     const claimedRewards = stakingInfo.stakingLedger.claimedRewards;
+    console.log(`\x1b[1m -> Claimed rewards: ${JSON.stringify(claimedRewards)}\x1b[0m`);
 
     let transactions = [];
+    let unclaimedRewards = [];
     let era = currentEra - 84;
 
     for (era; era < currentEra; era++) {
@@ -129,9 +137,11 @@ const main = async () => {
       const eraValidators = Object.keys(eraPoints.individual.toHuman());
       if (eraValidators.includes(validator) && !claimedRewards.includes(era)) {
         transactions.push(api.tx.staking.payoutStakers(validator, era));
+        unclaimedRewards.push(era);
       }
     }
     if (transactions.length > 0) {
+      console.log(`\x1b[1m -> Unclaimed rewards: ${JSON.stringify(unclaimedRewards)}\x1b[0m`);
       // Claim rewards tx
       const nonce = (await api.derive.balances.account(address)).accountNonce
       const hash = await api.tx.utility.batch(transactions).signAndSend(signer, { nonce });
@@ -139,6 +149,8 @@ const main = async () => {
       if (log) {
         fs.appendFileSync(`autopayout.log`, `${new Date()} - Claimed rewards, transaction hash is ${hash.toString()}`);
       }
+    } else {
+      console.log(`\n\x1b[33m\x1b[1mWarning! There's no unclaimed rewards, exiting!\x1b[0m\n`);
     }
     process.exit(0);
   }
