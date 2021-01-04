@@ -20,19 +20,14 @@ Go to [Polkadot JS UI](https://polkadot.js.org/apps/#/accounts) and export the a
 
 ## Usage
 
-```
-$ node autopayout.js --help
-node autopayout.js -a account.json -p password
-```
-
-Example (will ask the password from stdin):
+Subscription mode:
 
 ```
-node autopayout.js -c keystores/account.json
+$ node autopayout.js -a keystores/account.json -p password -v validator_stash_address
 ```
 
-Output:
+Cron mode:
 
 ```
-
+$ node autopayout-cron.js -a keystores/account.json -p password -v validator_stash_address
 ```
