@@ -2,7 +2,7 @@
   "name": "substrate-auto-payout",
   "version": "1.0.0",
   "description": "Auto payout script for Substrate based blockchains Polkadot, Kusama and Westend",
-  "main": "rotatekeys.js",
+  "main": "autopayout.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
