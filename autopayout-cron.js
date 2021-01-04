@@ -132,6 +132,7 @@ const main = async () => {
         fs.appendFileSync(`autopayout.log`, `${new Date()} - Claimed rewards, transaction hash is ${hash.toString()}`);
       }
     }
+    process.exit();
   }
 }
 
