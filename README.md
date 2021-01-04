@@ -23,3 +23,9 @@ Go to [Polkadot JS UI](https://polkadot.js.org/apps/#/accounts) and export the a
 ```
 node autopayout.js -a keystores/account.json -p password -v validator_stash_address
 ```
+
+Or simply edit `config.js` with your data and run without any parameter:
+
+```
+node autopayout.js
+```
