@@ -6,7 +6,7 @@ Made with ❤️ from ColmenaLabs_SVQ!
 
 ## Install
 
-First of all, you need nodejs (>= v10.20.1) installed, check https://nodejs.org/en/download/ to install it in your platform.
+Needs nodejs (>= v10.20.1), check https://nodejs.org/en/download/ to install for your platform.
 
 Clone the repository and install the needed dependencies:
 
