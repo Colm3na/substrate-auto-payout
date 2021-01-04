@@ -126,7 +126,7 @@ const main = async () => {
     // Check validator unclaimed rewards
     const stakingInfo = await api.derive.staking.account(validator);
     const claimedRewards = stakingInfo.stakingLedger.claimedRewards;
-    console.log(`\x1b[1m -> Claimed rewards: ${JSON.stringify(claimedRewards)}\x1b[0m`);
+    console.log(`\x1b[1m -> Claimed eras: ${JSON.stringify(claimedRewards)}\x1b[0m`);
 
     let transactions = [];
     let unclaimedRewards = [];
@@ -141,7 +141,7 @@ const main = async () => {
       }
     }
     if (transactions.length > 0) {
-      console.log(`\x1b[1m -> Unclaimed rewards: ${JSON.stringify(unclaimedRewards)}\x1b[0m`);
+      console.log(`\x1b[1m -> Unclaimed eras: ${JSON.stringify(unclaimedRewards)}\x1b[0m`);
       // Claim rewards tx
       const nonce = (await api.derive.balances.account(address)).accountNonce
       const hash = await api.tx.utility.batch(transactions).signAndSend(signer, { nonce });
