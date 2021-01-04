@@ -1,7 +1,7 @@
 /**
  * autopayout.js
  *  
- * Claim validator rewards automatically on a new era
+ * Claim and distribute validator staking rewards for your stakers
  *
  * https://github.com/Colm3na/polkadot-auto-payout
  * 
@@ -17,6 +17,7 @@ keyring.initKeyring({
 const fs = require('fs');
 const prompts = require('prompts');
 const yargs = require('yargs');
+const config = require('./config.js');
 
 const argv = yargs
   .scriptName("autopayout.js")
@@ -40,38 +41,42 @@ const argv = yargs
     description: 'log (append) to autopayout.log file',
     type: 'boolean',
   })
-  .demandOption(['account'], 'Please provide the account json file path')
-  .usage("node autopayout.js -c account.json -p password")
+  .usage("node autopayout.js -c keystores/account.json -p password -v validator_stash_address")
   .help()
   .alias('help', 'h')
   .version()
   .alias('version', 'V')
   .argv;
 
-// Exported account json file
-const accountJSON = argv.account;
+// Exported account json file param
+const accountJSON = argv.account || config.accountJSON;
 
 // Password param
-let password = argv.password || false;
+let password = argv.password || config.password;
 
-// Validator address
-const validator = argv.validator;
+// Validator address param
+const validator = argv.validator || config.validator;
 
 // Logging to file param
-const log = argv.log || false;
+const log = argv.log || config.logFile;
 
 // Node websocket
-const wsProvider = `ws://localhost:9944`;
+const wsProvider = config.nodeWS;
 
 const main = async () => {
-
-  let savedEra = 0;
 
   console.log("\n\x1b[45m\x1b[1m Substrate auto payout \x1b[0m\n");
   console.log("\x1b[1m - Check source at https://github.com/Colm3na/substrate-auto-payout\x1b[0m");
   console.log("\x1b[32m\x1b[1m - Made with love from ColmenaLabs_SVQ https://colmenalabs.org/\x1b[0m\n");
 
-  let raw = fs.readFileSync(accountJSON, { encoding: 'utf-8' });
+  let raw;
+  try {
+    raw = fs.readFileSync(accountJSON, { encoding: 'utf-8' });
+  } catch(err) {
+    console.log(`\x1b[31m\x1b[1mERROR: Can't open ${accountJSON}\x1b[0m\n`);
+    process.exit(1);
+  }
+
   const account = JSON.parse(raw);
   const address = account.address;
   
@@ -103,51 +108,39 @@ const main = async () => {
       accountBalance.data.miscFrozen.toString()
     )
     if (freeBalance === 0) {
-      console.log(`\x1b[1m -> Account doesn't have free funds\x1b[0m`);
+      console.log(`\x1b[31m\x1b[1mERROR: Account ${address} doesn't have free funds\x1b[0m\n`);
+      process.exit(1);
     }
-    console.log(`\x1b[1m -> Account free balance is ${(freeBalance * 1e-12).toFixed(3)} KSM\x1b[0m`);
+    console.log(`\x1b[1m -> Account ${address} free balance is ${(new BigNumber(freeBalance).div(new BigNumber(10).pow(config.decimalPlaces))).toFixed(3)} ${config.denom}\x1b[0m`);
 
-    // Subscribe to new blocks
-    console.log(`\x1b[1m -> Subscribing to new blocks\x1b[0m`);
-    await api.rpc.chain.subscribeNewHeads(async () => {
+    // Get session progress info
+    const currentEra = await api.query.staking.currentEra();
+    console.log(`\x1b[1m -> Current era is ${currentEra}\x1b[0m`);
   
-      // Get session progress info
-      const currentEra = await api.query.staking.currentEra();
+    // Check validator unclaimed rewards
+    const stakingInfo = await api.derive.staking.account(validator);
+    const claimedRewards = stakingInfo.stakingLedger.claimedRewards;
 
-      if (currentEra > savedEra) {
-        console.log(`\x1b[1m -> Current era is ${currentEra}, waiting era change ...\x1b[0m`);
-        savedEra = currentEra;
+    let transactions = [];
+    let era = currentEra - 84;
 
-        // Check validator unclaimed rewards
-        const stakingInfo = await api.derive.staking.account(validator);
-        const claimedRewards = stakingInfo.stakingLedger.claimedRewards;
-        const lastClaimedReward = claimedRewards[claimedRewards.length - 1];
-        console.log(`\x1b[1m -> Last claimed era is ${lastClaimedReward}\x1b[0m`);
-        if (lastClaimedReward < currentEra) {
-          console.log(`\x1b[1m -> ${currentEra - lastClaimedReward - 1} unclaimed era rewards\x1b[0m`);
-          let transactions = [];
-          let era = parseInt(lastClaimedReward) + 1;
-          for (era; era < currentEra; era++) {
-            // Check if validator was active at era
-            const eraPoints = await api.query.staking.erasRewardPoints(era);
-            const eraValidators = Object.keys(JSON.parse(JSON.stringify(eraPoints.individual))).map(validator => {
-              return validator;
-            });
-            if (eraValidators.includes(validator)) {
-              transactions.push(api.tx.staking.payoutStakers(validator, era));
-            }
-          }
-
-          // Claim rewards tx
-          const nonce = (await api.derive.balances.account(address)).accountNonce
-          const hash = await api.tx.utility.batch(transactions).signAndSend(signer, { nonce });
-          console.log(`\n\x1b[32m\x1b[1mSuccess! \x1b[37mCheck tx in PolkaScan: https://polkascan.io/kusama/transaction/${hash.toString()}\x1b[0m\n`);
-          if (log) {
-            fs.appendFileSync(`autopayout.log`, `${new Date()} - Current era ${currentEra}, claimed rewards for last ${currentEra - lastClaimedReward - 1} eras, tx hash is ${hash.toString()}`);
-          }
-        }
+    for (era; era < currentEra; era++) {
+      const eraPoints = await api.query.staking.erasRewardPoints(era);
+      const eraValidators = Object.keys(eraPoints.individual.toHuman());
+      if (eraValidators.includes(validator) && !claimedRewards.includes(era)) {
+        transactions.push(api.tx.staking.payoutStakers(validator, era));
       }
-    });
+    }
+    if (transactions.length > 0) {
+      // Claim rewards tx
+      const nonce = (await api.derive.balances.account(address)).accountNonce
+      const hash = await api.tx.utility.batch(transactions).signAndSend(signer, { nonce });
+      console.log(`\n\x1b[32m\x1b[1mSuccess! \x1b[37mCheck tx in PolkaScan: https://polkascan.io/kusama/transaction/${hash.toString()}\x1b[0m\n`);
+      if (log) {
+        fs.appendFileSync(`autopayout.log`, `${new Date()} - Claimed rewards, transaction hash is ${hash.toString()}`);
+      }
+    }
+    process.exit(0);
   }
 }
 

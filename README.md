@@ -13,21 +13,13 @@ Clone the repository and install the needed dependencies:
 ```
 git clone https://github.com/Colm3na/substrate-auto-payout.git
 cd polkadot-auto-payout
-npm install
+yarn
 ```
 
 Go to [Polkadot JS UI](https://polkadot.js.org/apps/#/accounts) and export the account you want to use to json format, then copy the json file/s in the `keystores` folder.
 
 ## Usage
 
-Subscription mode:
-
 ```
 node autopayout.js -a keystores/account.json -p password -v validator_stash_address
-```
-
-Cron mode:
-
-```
-node autopayout-cron.js -a keystores/account.json -p password -v validator_stash_address
 ```
