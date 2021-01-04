@@ -123,13 +123,14 @@ const main = async () => {
         transactions.push(api.tx.staking.payoutStakers(validator, era));
       }
     }
-
-    // Claim rewards tx
-    const nonce = (await api.derive.balances.account(address)).accountNonce
-    const hash = await api.tx.utility.batch(transactions).signAndSend(signer, { nonce });
-    console.log(`\n\x1b[32m\x1b[1mSuccess! \x1b[37mCheck tx in PolkaScan: https://polkascan.io/kusama/transaction/${hash.toString()}\x1b[0m\n`);
-    if (log) {
-      fs.appendFileSync(`autopayout.log`, `${new Date()} - Claimed rewards, transaction hash is ${hash.toString()}`);
+    if (transactions.length > 0) {
+      // Claim rewards tx
+      const nonce = (await api.derive.balances.account(address)).accountNonce
+      const hash = await api.tx.utility.batch(transactions).signAndSend(signer, { nonce });
+      console.log(`\n\x1b[32m\x1b[1mSuccess! \x1b[37mCheck tx in PolkaScan: https://polkascan.io/kusama/transaction/${hash.toString()}\x1b[0m\n`);
+      if (log) {
+        fs.appendFileSync(`autopayout.log`, `${new Date()} - Claimed rewards, transaction hash is ${hash.toString()}`);
+      }
     }
   }
 }
