@@ -111,11 +111,11 @@ const main = async () => {
     console.log(`\x1b[1m -> Current era is ${currentEra}\x1b[0m`);
 
     let transactions = [];
-    let era = currentEra - 84;
 
     for (let index = 0; index < config.validators.length; index++) {
       const validator = config.validators[index];
       let unclaimedRewards = [];
+      let era = currentEra - 84;
       const stakingInfo = await api.derive.staking.account(validator);
       const claimedRewards = stakingInfo.stakingLedger.claimedRewards;
       console.log(`\x1b[1m -> Claimed eras for validator ${validator}: ${JSON.stringify(claimedRewards)}\x1b[0m`);
