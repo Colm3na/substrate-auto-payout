@@ -61,3 +61,11 @@ Success! Check tx in PolkaScan: https://polkascan.io/kusama/transaction/0xdb63b7
 NOTE: Set `config.js` file permissions to `600` for better security.
 
 TODO: It doesn't take in account ongoing elections yet!
+
+## Using multiple validators
+
+Edit `validators` array in `config.js` to add the stash address of your validators, then:
+
+```
+node autopayout-validators.js
+```
