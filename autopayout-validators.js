@@ -140,6 +140,9 @@ const main = async () => {
       }
     } else {
       console.log(`\n\x1b[33m\x1b[1mWarning! There's no unclaimed rewards, exiting!\x1b[0m\n`);
+      if (log) {
+        fs.appendFileSync(`autopayout.log`, `${new Date()} - There's no unclaimed rewards`);
+      }
     }
     process.exit(0);
   }
