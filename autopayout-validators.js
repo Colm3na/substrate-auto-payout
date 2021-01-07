@@ -136,12 +136,12 @@ const main = async () => {
       const hash = await api.tx.utility.batch(transactions).signAndSend(signer, { nonce });
       console.log(`\n\x1b[32m\x1b[1mSuccess! \x1b[37mCheck tx in PolkaScan: https://polkascan.io/kusama/transaction/${hash.toString()}\x1b[0m\n`);
       if (log) {
-        fs.appendFileSync(`autopayout.log`, `${new Date()} - Claimed rewards, transaction hash is ${hash.toString()}`);
+        fs.appendFileSync(`autopayout.log`, `${new Date()} - Claimed rewards, transaction hash is ${hash.toString()}\n`);
       }
     } else {
       console.log(`\n\x1b[33m\x1b[1mWarning! There's no unclaimed rewards, exiting!\x1b[0m\n`);
       if (log) {
-        fs.appendFileSync(`autopayout.log`, `${new Date()} - There's no unclaimed rewards`);
+        fs.appendFileSync(`autopayout.log`, `${new Date()} - There's no unclaimed rewards\n`);
       }
     }
     process.exit(0);
