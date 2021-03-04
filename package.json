@@ -22,9 +22,9 @@
   "author": "mariopino",
   "license": "GPL-3.0-only",
   "dependencies": {
-    "@polkadot/api": "^3.3.1",
-    "@polkadot/ui-keyring": "^0.65.1",
-    "@polkadot/ui-settings": "^0.65.1",
+    "@polkadot/api": "^v3.11.1",
+    "@polkadot/ui-keyring": "^0.68.1",
+    "@polkadot/ui-settings": "^0.68.1",
     "bignumber.js": "^9.0.1",
     "prompts": "^2.4.0",
     "yargs": "^16.2.0"
