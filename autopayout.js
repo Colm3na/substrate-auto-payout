@@ -120,8 +120,9 @@ const main = async () => {
     console.log(`\x1b[1m -> Account ${address} free balance is ${(new BigNumber(freeBalance).div(new BigNumber(10).pow(config.decimalPlaces))).toFixed(3)} ${config.denom}\x1b[0m`);
 
     // Get session progress info
-    const currentEra = await api.query.staking.currentEra();
-    console.log(`\x1b[1m -> Current era is ${currentEra}\x1b[0m`);
+    const chainActiveEra = await api.query.staking.activeEra();
+    const activeEra = JSON.parse(JSON.stringify(chainActiveEra)).index;
+    console.log(`\x1b[1m -> Active era is ${activeEra}\x1b[0m`);
   
     // Check validator unclaimed rewards
     const stakingInfo = await api.derive.staking.account(validator);

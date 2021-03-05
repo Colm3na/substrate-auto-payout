@@ -107,19 +107,20 @@ const main = async () => {
     console.log(`\x1b[1m -> Account ${address} free balance is ${(new BigNumber(freeBalance).div(new BigNumber(10).pow(config.decimalPlaces))).toFixed(3)} ${config.denom}\x1b[0m`);
 
     // Get session progress info
-    const currentEra = await api.query.staking.currentEra();
-    console.log(`\x1b[1m -> Current era is ${currentEra}\x1b[0m`);
+    const chainActiveEra = await api.query.staking.activeEra();
+    const activeEra = JSON.parse(JSON.stringify(chainActiveEra)).index;
+    console.log(`\x1b[1m -> Active era is ${activeEra}\x1b[0m`);
 
     let transactions = [];
 
     for (let index = 0; index < config.validators.length; index++) {
       const validator = config.validators[index];
       let unclaimedRewards = [];
-      let era = currentEra - 84;
+      let era = activeEra - 84;
       const stakingInfo = await api.derive.staking.account(validator);
       const claimedRewards = stakingInfo.stakingLedger.claimedRewards;
       console.log(`\x1b[1m -> Claimed eras for validator ${validator}: ${JSON.stringify(claimedRewards)}\x1b[0m`);
-      for (era; era < currentEra; era++) {
+      for (era; era < activeEra; era++) {
         const eraPoints = await api.query.staking.erasRewardPoints(era);
         const eraValidators = Object.keys(eraPoints.individual.toHuman());
         if (eraValidators.includes(validator) && !claimedRewards.includes(era)) {
