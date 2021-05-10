@@ -95,16 +95,13 @@ const main = async () => {
     const api = await ApiPromise.create({ provider });
 
     // Check account balance
-    const accountBalance = await api.query.system.account(address)
-    const totalBalance = accountBalance.data.free
-    const freeBalance = BigNumber(totalBalance.toString()).minus(
-      accountBalance.data.miscFrozen.toString()
-    )
-    if (freeBalance === 0) {
-      console.log(`\x1b[31m\x1b[1mError! Account ${address} doesn't have free funds\x1b[0m\n`);
+    const accountBalance = await api.derive.balances.all(address);
+    const availableBalance = accountBalance.availableBalance;
+    if (availableBalance.eq(0)) {
+      console.log(`\x1b[31m\x1b[1mError! Account ${address} doesn't have available funds\x1b[0m\n`);
       process.exit(1);
     }
-    console.log(`\x1b[1m -> Account ${address} free balance is ${(new BigNumber(freeBalance).div(new BigNumber(10).pow(config.decimalPlaces))).toFixed(3)} ${config.denom}\x1b[0m`);
+    console.log(`\x1b[1m -> Account ${address} available balance is ${availableBalance.toHuman()}\x1b[0m`);
 
     // Get session progress info
     const chainActiveEra = await api.query.staking.activeEra();
