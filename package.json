@@ -25,8 +25,8 @@
     "@polkadot/api": "^v8.5.1",
     "@polkadot/keyring": "^9.2.1",
     "@polkadot/ui-keyring": "^2.2.1",
-    "bignumber.js": "^9.0.1",
-    "prompts": "^2.4.0",
-    "yargs": "^16.2.0"
+    "bignumber.js": "^9.0.2",
+    "prompts": "^2.4.2",
+    "yargs": "^17.5.1"
   }
 }
